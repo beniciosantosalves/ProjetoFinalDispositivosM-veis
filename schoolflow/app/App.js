@@ -16,6 +16,7 @@ async function getDb() {
 
 export default function App() {
   const [tarefas, setTarefas] = useState([]);
+  const [diaSelecionado, setDiaSelecionado] = useState('Segunda');
 
   const createTables = async () => {
     try {
@@ -25,15 +26,24 @@ export default function App() {
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
         dia TEXT NOT NULL DEFAULT 'Segunda',
-        status TEXT DEFAULT 'em_progresso'
+        status TEXT DEFAULT 'em_progresso',
+        foto TEXT
       );
     `);
 
       const colunas = await database.getAllAsync("PRAGMA table_info(tarefas)");
+
       const temColunaDia = colunas.some((col) => col.name === 'dia');
       if (!temColunaDia) {
         await database.execAsync(
           "ALTER TABLE tarefas ADD COLUMN dia TEXT NOT NULL DEFAULT 'Segunda'"
+        );
+      }
+
+      const temColunaFoto = colunas.some((col) => col.name === 'foto');
+      if (!temColunaFoto) {
+        await database.execAsync(
+          "ALTER TABLE tarefas ADD COLUMN foto TEXT"
         );
       }
     } catch (error) {
@@ -53,13 +63,13 @@ export default function App() {
     }
   };
 
-  const addTarefa = async (nome, dia) => {
+  const addTarefa = async (nome, dia, foto) => {
     if (nome == null || nome.trim() === '') return;
     try {
       const database = await getDb();
       await database.runAsync(
-        'INSERT INTO tarefas (nome, dia) VALUES (?, ?)',
-        [nome.trim(), dia]
+        'INSERT INTO tarefas (nome, dia, foto) VALUES (?, ?, ?)',
+        [nome.trim(), dia, foto]
       );
       Keyboard.dismiss();
       await getTarefas();
@@ -126,6 +136,7 @@ export default function App() {
                     key={tarefa.id}
                     tarefa={tarefa.nome}
                     status={tarefa.status}
+                    foto={tarefa.foto}
                     updateStatus={() => updateStatus(tarefa.id, tarefa.status)}
                     deleteTarefa={() => deleteTarefa(tarefa.id)}
                   />
@@ -135,7 +146,11 @@ export default function App() {
           );
         })}
       </ScrollView>
-      <AdicionarTarefa addTarefa={addTarefa} />
+      <AdicionarTarefa
+        addTarefa={addTarefa}
+        diaSelecionado={diaSelecionado}
+        setDiaSelecionado={setDiaSelecionado}
+      />
     </View>
   );
 }

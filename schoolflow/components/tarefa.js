@@ -1,5 +1,5 @@
 import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from "react-native";
+import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
 export default function Tarefa(props) {
@@ -7,6 +7,9 @@ export default function Tarefa(props) {
 
   return (
     <View style={styles.container}>
+      {props.foto && (
+        <Image source={{ uri: props.foto }} style={styles.foto} />
+      )}
       <View style={styles.containerNomeAtividade}>
         <Text style={[styles.nomeAtividade, props.status === 'completo' && { textDecorationLine: 'line-through', opacity: 0.6 }]}>
           {props.tarefa.length > 70 ? props.tarefa.slice(0, 72) + '...' : props.tarefa}
@@ -48,8 +51,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     flexDirection: 'row',
   },
+  foto: {
+    width: 80,
+    height: '100%',
+    borderTopLeftRadius: 10,
+    borderBottomLeftRadius: 10,
+  },
   containerNomeAtividade: {
-    width: '80%',
+    flex: 1,
     justifyContent: 'center',
     padding: 10,
   },
