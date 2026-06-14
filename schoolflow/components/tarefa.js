@@ -14,25 +14,25 @@ export default function Tarefa(props) {
       </View>
       <View style={styles.opcoes}>
         <TouchableOpacity
-          style={[styles.botaoEstado, { backgroundColor: completo ? 'green' : 'yellow' }]}
-          onPress={!completo ? () => 
-            props.updateStatus(): 
+          style={[styles.botaoEstado, { backgroundColor: completo ? '#fff' : '#333' }]}
+          onPress={!completo ? () =>
+            props.updateStatus() :
             () => Alert.alert(
-            'Mudar status',
-            `Tem certeza que deseja marcar como ${completo ? 'em progresso' : 'completo'}?`,
-            [
+              'Mudar status',
+              `Tem certeza que deseja marcar como ${completo ? 'em progresso' : 'completo'}?`,
+              [
                 { text: 'Cancelar', style: 'cancel' },
                 { text: 'Confirmar', onPress: () => props.updateStatus() },
-            ]
+              ]
             )
           }
         >
           <Text style={{ color: completo ? 'white' : '#333', fontSize: 16 }}>
-            {completo ? <MaterialIcons name="check" size={20} color="white" />  : <MaterialIcons name="hourglass-empty" size={20} color="#333" /> }
+            {completo ? <MaterialIcons name="check" size={20} color="white" /> : <MaterialIcons name="hourglass-empty" size={20} color="#333" />}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.botaoDeletar} onPress={() => props.deleteTarefa()}>
-          <MaterialIcons name="delete" size={20} color={'white'} />
+          <MaterialIcons name="delete" size={20} color={'#fff'} />
         </TouchableOpacity>
       </View>
     </View>

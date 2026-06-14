@@ -18,19 +18,28 @@ export default function App() {
   const [tarefas, setTarefas] = useState([]);
 
   const createTables = async () => {
-  try {
-    const database = await getDb();
-    await database.execAsync(`
+    try {
+      const database = await getDb();
+      await database.execAsync(`
       CREATE TABLE IF NOT EXISTS tarefas (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
         nome TEXT NOT NULL,
+        dia TEXT NOT NULL DEFAULT 'Segunda',
         status TEXT DEFAULT 'em_progresso'
       );
     `);
-  } catch (error) {
-    console.log('Erro ao criar tabela: ' + error.message);
-  }
-};
+
+      const colunas = await database.getAllAsync("PRAGMA table_info(tarefas)");
+      const temColunaDia = colunas.some((col) => col.name === 'dia');
+      if (!temColunaDia) {
+        await database.execAsync(
+          "ALTER TABLE tarefas ADD COLUMN dia TEXT NOT NULL DEFAULT 'Segunda'"
+        );
+      }
+    } catch (error) {
+      console.log('Erro ao criar tabela: ' + error.message);
+    }
+  };
 
   const getTarefas = async () => {
     try {
@@ -44,13 +53,13 @@ export default function App() {
     }
   };
 
-  const addTarefa = async (nome) => {
+  const addTarefa = async (nome, dia) => {
     if (nome == null || nome.trim() === '') return;
     try {
       const database = await getDb();
       await database.runAsync(
-        'INSERT INTO tarefas (nome) VALUES (?)',
-        [nome.trim()]
+        'INSERT INTO tarefas (nome, dia) VALUES (?, ?)',
+        [nome.trim(), dia]
       );
       Keyboard.dismiss();
       await getTarefas();
@@ -91,27 +100,40 @@ export default function App() {
     iniciarBanco();
   }, []);
 
+  const diasOrdem = ['Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado', 'Domingo'];
+
   return (
-    <View style={{ backgroundColor: '#A8D1F9', flex: 1, alignItems: 'center' }}>
+    <View style={{ backgroundColor: '#000000', flex: 1, alignItems: 'center' }}>
       <TopBar />
       <ScrollView
         style={styles.scroll}
-        contentContainerStyle={{ alignItems: 'center', gap: 16, paddingBottom: 30}}
+        contentContainerStyle={{ alignItems: 'center', gap: 16, paddingBottom: 30, width: '100%' }}
       >
         {tarefas.length === 0 && (
-        <Text style={{ color: '#fff', marginTop: 40, fontSize: 16 }}>
-            Nenhuma tarefa adicionada ainda...
-        </Text>
+          <Text style={{ color: '#888', marginTop: 40, fontSize: 16 }}>
+            Nenhum exercício adicionado ainda...
+          </Text>
         )}
-        {tarefas.map((tarefa) => (
-          <Tarefa
-            key={tarefa.id}
-            tarefa={tarefa.nome}
-            status={tarefa.status}
-            updateStatus={() => updateStatus(tarefa.id, tarefa.status)}
-            deleteTarefa={() => deleteTarefa(tarefa.id)}
-          />
-        ))}
+        {diasOrdem.map((dia) => {
+          const tarefasDoDia = tarefas.filter((t) => t.dia === dia);
+          if (tarefasDoDia.length === 0) return null;
+          return (
+            <View key={dia} style={{ width: '100%', alignItems: 'center' }}>
+              <Text style={styles.diaTitulo}>{dia}</Text>
+              <View style={{ width: '100%', alignItems: 'center', gap: 16 }}>
+                {tarefasDoDia.map((tarefa) => (
+                  <Tarefa
+                    key={tarefa.id}
+                    tarefa={tarefa.nome}
+                    status={tarefa.status}
+                    updateStatus={() => updateStatus(tarefa.id, tarefa.status)}
+                    deleteTarefa={() => deleteTarefa(tarefa.id)}
+                  />
+                ))}
+              </View>
+            </View>
+          );
+        })}
       </ScrollView>
       <AdicionarTarefa addTarefa={addTarefa} />
     </View>
@@ -123,5 +145,18 @@ const styles = StyleSheet.create({
     width: '100%',
     flex: 1,
     paddingTop: 20,
+  },
+  diaTitulo: {
+    color: '#fff',
+    fontSize: 20,
+    fontWeight: 'bold',
+    marginBottom: 8,
+    marginTop: 8,
+    alignSelf: 'flex-start',
+    marginLeft: '10%',
+    borderBottomWidth: 1,
+    borderBottomColor: '#333',
+    paddingBottom: 4,
+    width: '80%',
   },
 });

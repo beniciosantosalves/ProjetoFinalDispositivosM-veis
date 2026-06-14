@@ -1,34 +1,28 @@
-import React from "react";
-import {
-     View, 
-    Text,
-    Image,
-    StyleSheet
-} from "react-native";
+    import React from "react";
+    import { View, Text, StyleSheet } from "react-native";
 
-export default function TopBar(){
-    return(
-        <View style={styles.container}>
-            <Image
-            source={require("../assets/schoolflow-removebg-preview.png")}
-            style={styles.logo}
-            />
-        </View>
-    )
-}
-
-const styles = StyleSheet.create({
-    container: {
-        width: '100%',
-        height: 120,
-        elevation: 10,
-        display: 'flex',
-        backgroundColor:'#67aef5',
-        alignItems:'center',
-    },
-    logo:{
-        marginTop:30,
-        width:'60%',
-        height:'80%'
+    export default function TopBar(){
+        return(
+            <View style={styles.container}>
+                <Text style={styles.title}>Minhas Tarefas</Text>
+            </View>
+        )
     }
-})
+
+    const styles = StyleSheet.create({
+        container: {
+            width: '100%',
+            height: 100,
+            elevation: 10,
+            backgroundColor:'#000000',
+            alignItems:'center',
+            justifyContent:'center',
+            borderBottomWidth: 1,
+            borderBottomColor: '#333',
+        },
+        title:{
+            color:'#fff',
+            fontSize: 26,
+            fontWeight:'bold',
+        }
+    })
