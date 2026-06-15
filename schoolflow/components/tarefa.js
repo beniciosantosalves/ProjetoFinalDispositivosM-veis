@@ -2,41 +2,60 @@ import React from "react";
 import { View, Text, StyleSheet, TouchableOpacity, Alert, Image } from "react-native";
 import { MaterialIcons } from '@expo/vector-icons';
 
+const ALTURA_FOTO = 180;
+
 export default function Tarefa(props) {
   const completo = props.status === 'completo';
+  const temFoto = !!props.foto;
 
   return (
     <View style={styles.container}>
-      {props.foto && (
+      {temFoto && (
         <Image source={{ uri: props.foto }} style={styles.foto} />
       )}
-      <View style={styles.containerNomeAtividade}>
-        <Text style={[styles.nomeAtividade, props.status === 'completo' && { textDecorationLine: 'line-through', opacity: 0.6 }]}>
-          {props.tarefa.length > 70 ? props.tarefa.slice(0, 72) + '...' : props.tarefa}
-        </Text>
-      </View>
-      <View style={styles.opcoes}>
-        <TouchableOpacity
-          style={[styles.botaoEstado, { backgroundColor: completo ? '#fff' : '#333' }]}
-          onPress={!completo ? () =>
-            props.updateStatus() :
-            () => Alert.alert(
-              'Mudar status',
-              `Tem certeza que deseja marcar como ${completo ? 'em progresso' : 'completo'}?`,
-              [
-                { text: 'Cancelar', style: 'cancel' },
-                { text: 'Confirmar', onPress: () => props.updateStatus() },
-              ]
-            )
-          }
-        >
-          <Text style={{ color: completo ? 'white' : '#333', fontSize: 16 }}>
-            {completo ? <MaterialIcons name="check" size={20} color="white" /> : <MaterialIcons name="hourglass-empty" size={20} color="#333" />}
+
+      <View style={styles.linha}>
+        <View style={styles.containerNomeAtividade}>
+          <Text
+            style={[styles.nomeAtividade, completo && styles.nomeAtividadeCompleta]}
+            numberOfLines={2}
+          >
+            {props.tarefa.length > 70 ? props.tarefa.slice(0, 72) + '...' : props.tarefa}
           </Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.botaoDeletar} onPress={() => props.deleteTarefa()}>
-          <MaterialIcons name="delete" size={20} color={'#fff'} />
-        </TouchableOpacity>
+          <View style={styles.statusContainer}>
+            <View style={[styles.statusBolinha, { backgroundColor: completo ? '#4ADE80' : '#FACC15' }]} />
+            <Text style={styles.statusTexto}>
+              {completo ? 'Completo' : 'Em progresso'}
+            </Text>
+          </View>
+        </View>
+
+        <View style={styles.acoes}>
+          <TouchableOpacity
+            style={[styles.botaoIcone, { backgroundColor: completo ? '#4ADE80' : '#2a2a2a' }]}
+            onPress={!completo ? () =>
+              props.updateStatus() :
+              () => Alert.alert(
+                'Mudar status',
+                `Tem certeza que deseja marcar como ${completo ? 'em progresso' : 'completo'}?`,
+                [
+                  { text: 'Cancelar', style: 'cancel' },
+                  { text: 'Confirmar', onPress: () => props.updateStatus() },
+                ]
+              )
+            }
+          >
+            {completo ? (
+              <MaterialIcons name="check" size={20} color="#0a0a0a" />
+            ) : (
+              <MaterialIcons name="hourglass-empty" size={20} color="#fff" />
+            )}
+          </TouchableOpacity>
+
+          <TouchableOpacity style={styles.botaoIcone} onPress={() => props.deleteTarefa()}>
+            <MaterialIcons name="delete-outline" size={20} color="#F87171" />
+          </TouchableOpacity>
+        </View>
       </View>
     </View>
   );
@@ -44,48 +63,61 @@ export default function Tarefa(props) {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#268BF1',
-    marginHorizontal: '10%',
-    height: 100,
-    elevation: 5,
-    borderRadius: 10,
-    flexDirection: 'row',
+    width: '80%',
+    backgroundColor: '#1a1a1a',
+    borderRadius: 14,
+    borderWidth: 1,
+    borderColor: '#2a2a2a',
+    overflow: 'hidden',
   },
   foto: {
-    width: 80,
-    height: '100%',
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
+    width: '100%',
+    height: ALTURA_FOTO,
+  },
+  linha: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 14,
+    gap: 10,
   },
   containerNomeAtividade: {
     flex: 1,
-    justifyContent: 'center',
-    padding: 10,
+    gap: 6,
   },
   nomeAtividade: {
-    color: '#d7e8ff',
-    fontSize: 18,
+    color: '#f5f5f5',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  nomeAtividadeCompleta: {
+    textDecorationLine: 'line-through',
+    opacity: 0.5,
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  statusBolinha: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+  },
+  statusTexto: {
+    color: '#999',
+    fontSize: 12,
     fontWeight: '500',
   },
-  opcoes: {
-    height: '100%',
-    width: '20%',
-    backgroundColor: 'gray',
-    borderRadius: 10,
+  acoes: {
+    flexDirection: 'row',
+    gap: 8,
   },
-  botaoEstado: {
-    width: '100%',
-    height: '50%',
-    borderTopRightRadius: 10,
-    justifyContent: 'center',
+  botaoIcone: {
+    width: 38,
+    height: 38,
+    borderRadius: 19,
+    backgroundColor: '#2a2a2a',
     alignItems: 'center',
-  },
-  botaoDeletar: {
-    width: '100%',
-    height: '50%',
-    backgroundColor: '#d52828',
-    borderBottomRightRadius: 10,
     justifyContent: 'center',
-    alignItems: 'center',
   },
 });

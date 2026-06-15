@@ -69,7 +69,7 @@ export default function App() {
       const database = await getDb();
       await database.runAsync(
         'INSERT INTO tarefas (nome, dia, foto) VALUES (?, ?, ?)',
-        [nome.trim(), dia, foto]
+        [nome.trim(), dia, foto ?? null]
       );
       Keyboard.dismiss();
       await getTarefas();
